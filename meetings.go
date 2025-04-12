@@ -31,7 +31,7 @@ type Meeting struct {
 	Year                int       `json:"year"`
 }
 
-func (c *Client) getMettingsURL() string {
+func (c *Client) getMeetingsURL() string {
 	return c.baseUrl + meetingBase
 }
 
@@ -54,7 +54,7 @@ func (c *Client) GetMeetings(params MeetingParams) (MeetingResponse, error) {
 	}
 
 	urlArgs := ArgBuilder(args)
-	url := c.getMettingsURL() + urlArgs
+	url := c.getMeetingsURL() + urlArgs
 
 	fmt.Println(url)
 	resp, err := GetHTTPRequest(url)
@@ -79,7 +79,7 @@ func (c *Client) GetLatestMeeting() (Meeting, error) {
 	args = append(args, Arg{Key: "year", Value: strconv.Itoa(t.Year())})
 	urlArgs := ArgBuilder(args)
 
-	url := c.getMettingsURL() + urlArgs
+	url := c.getMeetingsURL() + urlArgs
 
 	resp, err := GetHTTPRequest(url)
 	if err != nil {
