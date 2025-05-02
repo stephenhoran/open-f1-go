@@ -2,7 +2,6 @@ package openf1go
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -34,14 +33,6 @@ func (c *Client) getMeetingsURL() string {
 	return c.baseUrl + meetingBase
 }
 
-func (c *Client) GetMeetingsRefactor(meeting Meeting) {
-	url, err := UrlBuilder(c.getMeetingsURL(), buildArgs(meeting))
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(url)
-}
-
 func (c *Client) GetMeetings(meeting Meeting) (MeetingResponse, error) {
 	var meetingResponse MeetingResponse
 
@@ -65,8 +56,7 @@ func (c *Client) GetMeetings(meeting Meeting) (MeetingResponse, error) {
 func (c *Client) GetLatestMeeting() (Meeting, error) {
 	var meetingResponse MeetingResponse
 	var meeting Meeting
-	args := []Arg{}
-	args = append(args, Arg{Key: "meeting_key", Value: "latest"})
+	args := []Arg{{Key: "meeting_key", Value: "latest"}}
 
 	url, err := UrlBuilder(c.getMeetingsURL(), args)
 	if err != nil {
