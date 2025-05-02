@@ -3,7 +3,6 @@ package openf1go
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -35,28 +34,22 @@ func (c *Client) getMeetingsURL() string {
 	return c.baseUrl + meetingBase
 }
 
-func (c *Client) GetMeetings(params MeetingParams) (MeetingResponse, error) {
-	var meetingResponse MeetingResponse
-	args := []Arg{}
-
-	if params.Year != "" {
-		args = append(args, Arg{
-			Key:   "year",
-			Value: params.Year,
-		})
+func (c *Client) GetMeetingsRefactor(meeting Meeting) {
+	url, err := UrlBuilder(c.getMeetingsURL(), buildArgs(meeting))
+	if err != nil {
+		fmt.Println(err)
 	}
-
-	if params.CountryName != "" {
-		args = append(args, Arg{
-			Key:   "country_name",
-			Value: params.CountryName,
-		})
-	}
-
-	urlArgs := ArgBuilder(args)
-	url := c.getMeetingsURL() + urlArgs
-
 	fmt.Println(url)
+}
+
+func (c *Client) GetMeetings(meeting Meeting) (MeetingResponse, error) {
+	var meetingResponse MeetingResponse
+
+	url, err := UrlBuilder(c.getMeetingsURL(), buildArgs(meeting))
+	if err != nil {
+		return MeetingResponse{}, err
+	}
+
 	resp, err := GetHTTPRequest(url)
 	if err != nil {
 		return nil, err
@@ -73,13 +66,12 @@ func (c *Client) GetLatestMeeting() (Meeting, error) {
 	var meetingResponse MeetingResponse
 	var meeting Meeting
 	args := []Arg{}
+	args = append(args, Arg{Key: "meeting_key", Value: "latest"})
 
-	t := time.Now()
-
-	args = append(args, Arg{Key: "year", Value: strconv.Itoa(t.Year())})
-	urlArgs := ArgBuilder(args)
-
-	url := c.getMeetingsURL() + urlArgs
+	url, err := UrlBuilder(c.getMeetingsURL(), args)
+	if err != nil {
+		return Meeting{}, err
+	}
 
 	resp, err := GetHTTPRequest(url)
 	if err != nil {

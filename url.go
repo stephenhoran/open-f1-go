@@ -3,6 +3,7 @@ package openf1go
 import (
 	"io"
 	"net/http"
+	"net/url"
 )
 
 type Arg struct {
@@ -10,30 +11,25 @@ type Arg struct {
 	Value string
 }
 
-func ArgBuilder(args []Arg) string {
-	var url string
-
-	if len(args) == 0 {
-		return url
+func UrlBuilder(s string, args []Arg) (*url.URL, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(args) > 0 {
-		url += "?"
+	q := url.Values{}
+
+	for _, arg := range args {
+		q.Set(arg.Key, arg.Value)
 	}
 
-	for i, arg := range args {
-		if i != 0 {
-			url += "&"
-		}
+	u.RawQuery = q.Encode()
 
-		url += arg.Key + "=" + arg.Value
-	}
-
-	return url
+	return u, nil
 }
 
-func GetHTTPRequest(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+func GetHTTPRequest(url *url.URL) ([]byte, error) {
+	resp, err := http.Get(url.String())
 	if err != nil {
 		return nil, err
 	}
