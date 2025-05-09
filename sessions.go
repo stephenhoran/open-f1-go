@@ -1,6 +1,9 @@
 package openf1go
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 const sessionsBase = "/sessions"
 
@@ -28,4 +31,25 @@ type Session []struct {
 
 func (c *Client) getSessionsURL() string {
 	return c.baseUrl + sessionsBase
+}
+
+func (c *Client) GetSessions(session Session) (SessionResponse, error) {
+	var sessionResponse SessionResponse
+
+	url, err := UrlBuilder(c.getSessionsURL(), buildArgs(session))
+	if err != nil {
+		return SessionResponse{}, nil
+	}
+
+	resp, err := GetHTTPRequest(url)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(resp, &sessionResponse); err != nil {
+		return nil, err
+	}
+
+	return sessionResponse, nil
+
 }
