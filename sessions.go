@@ -12,7 +12,7 @@ type SessionResponse []Session
 type SessionParams struct {
 }
 
-type Session []struct {
+type Session struct {
 	CircuitKey       int       `json:"circuit_key"`
 	CircuitShortName string    `json:"circuit_short_name"`
 	CountryCode      string    `json:"country_code"`
@@ -51,5 +51,28 @@ func (c *Client) GetSessions(session Session) (SessionResponse, error) {
 	}
 
 	return sessionResponse, nil
+
+}
+
+func (c *Client) GetLatestSessions() (Session, error) {
+	var sessionResponse SessionResponse
+
+	args := []Arg{{Key: "meeting_key", Value: "latest"}, {Key: "session_key", Value: "latest"}}
+
+	url, err := UrlBuilder(c.getSessionsURL(), args)
+	if err != nil {
+		return Session{}, nil
+	}
+
+	resp, err := GetHTTPRequest(url)
+	if err != nil {
+		return Session{}, err
+	}
+
+	if err := json.Unmarshal(resp, &sessionResponse); err != nil {
+		return Session{}, err
+	}
+
+	return sessionResponse[0], nil
 
 }

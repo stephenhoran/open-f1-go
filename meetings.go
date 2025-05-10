@@ -9,11 +9,6 @@ const meetingBase = "/meetings"
 
 type MeetingResponse []Meeting
 
-type MeetingParams struct {
-	Year        string
-	CountryName string
-}
-
 type Meeting struct {
 	CircuitKey          int       `json:"circuit_key"`
 	CircuitShortName    string    `json:"circuit_short_name"`
