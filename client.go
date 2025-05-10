@@ -17,3 +17,7 @@ func New() *Client {
 		baseUrl: "https://api.openf1.org/v1",
 	}
 }
+
+func (c *Client) getLatestSessionArgs() []Arg {
+	return []Arg{{Key: "meeting_key", Value: "latest"}, {Key: "session_key", Value: "latest"}}
+}

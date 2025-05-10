@@ -57,9 +57,7 @@ func (c *Client) GetSessions(session Session) (SessionResponse, error) {
 func (c *Client) GetLatestSessions() (Session, error) {
 	var sessionResponse SessionResponse
 
-	args := []Arg{{Key: "meeting_key", Value: "latest"}, {Key: "session_key", Value: "latest"}}
-
-	url, err := UrlBuilder(c.getSessionsURL(), args)
+	url, err := UrlBuilder(c.getSessionsURL(), c.getLatestSessionArgs())
 	if err != nil {
 		return Session{}, nil
 	}

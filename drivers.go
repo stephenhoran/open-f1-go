@@ -2,6 +2,7 @@ package openf1go
 
 import (
 	"encoding/json"
+	"errors"
 )
 
 const driversBase = "/drivers"
@@ -45,6 +46,39 @@ func (c *Client) GetDrivers(driver Driver) (DriversResponse, error) {
 	}
 
 	return driversResponse, nil
+}
+
+func (c *Client) GetDriver(driver Driver) (Driver, error) {
+	var driversResponse DriversResponse
+
+	if driver.FirstName == "" && driver.LastName == "" && driver.FullName == "" && driver.NameAcronym == "" && driver.DriverNumber == 0 {
+		return Driver{}, errors.New("search fields for a single driver not met, ensure at least one drive identifier is valid")
+	}
+
+	args := buildArgs(driver)
+	if driver.MeetingKey == 0 && driver.SessionKey == 0 {
+		args = append(args, c.getLatestSessionArgs()...)
+	}
+
+	url, err := UrlBuilder(c.getDriversURL(), args)
+	if err != nil {
+		return Driver{}, err
+	}
+
+	resp, err := GetHTTPRequest(url)
+	if err != nil {
+		return Driver{}, err
+	}
+
+	if err := json.Unmarshal(resp, &driversResponse); err != nil {
+		return Driver{}, err
+	}
+
+	if len(driversResponse) == 0 {
+		return Driver{}, errors.New("driver not found or too many drivers returned from search")
+	}
+
+	return driversResponse[0], nil
 }
 
 func (c *Client) GetLatestDrivers() (DriversResponse, error) {
